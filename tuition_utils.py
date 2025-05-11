@@ -10,7 +10,8 @@ TUITION_CHANNEL_REGEX_MATCHER = {
         "address": r"Location/Area: (.*)"
     },
     "🏆 Singapore Tuition Assignments Jobs - sgTuitions":{
-
+        "subject": r"Info: (.*) @",
+        "address": r"@ (.*) \("
     },
     "Elite Tutor Assignments 🤓":{
         "subject": r"Subject: (.*)",

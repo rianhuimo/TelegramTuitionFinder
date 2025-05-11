@@ -38,7 +38,10 @@ async def my_event_handler(event):
         print(event.message.message)
 
         message = event.message.message
+
         subject, student_address, matches_experience = get_tuition_details(message=message,tuition_channel=chat.title)
+        # i think i could put these variables in a neat little object instead. so i can pass it to a filtering function.
+
         print("\n\n===============🏫🗺️👩🏼‍🏫===============")
         print(f"Subject: {subject}")
         print(f"Address: {student_address}")
