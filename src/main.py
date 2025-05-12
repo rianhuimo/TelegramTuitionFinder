@@ -1,9 +1,9 @@
 import logging
 import re
 
-from tuition_utils import get_tuition_details
-logging.basicConfig(format='[%(levelname) %(asctime)s] %(name)s: %(message)s',
-                    level=logging.WARNING)
+from tuition_utils import match_suitable_tutors, get_tuition_details
+
+# logging.basicConfig(format='[%(levelname) %(asctime)s] %(name)s: %(message)s',level=logging.WARNING)
 
 from telethon import TelegramClient, events, types
 
@@ -39,16 +39,28 @@ async def my_event_handler(event):
 
         message = event.message.message
 
-        subject, student_address, matches_experience = get_tuition_details(message=message,tuition_channel=chat.title)
-        # i think i could put these variables in a neat little object instead. so i can pass it to a filtering function.
+        # retrieve tuition job info
+        tuition_job = get_tuition_details(message=message,tuition_channel=chat.title)
 
         print("\n\n===============🏫🗺️👩🏼‍🏫===============")
-        print(f"Subject: {subject}")
-        print(f"Address: {student_address}")
-        print(f"Matches my experience as a part/full time tutor?: {matches_experience}")
+        print(f"Subject: {tuition_job["subjects"]}")
+        print(f"Address: {tuition_job["address"]}")
+        print(f"Experience: {tuition_job["experience"]}")
+
+        tuition_job = match_suitable_tutors(tuition_job=tuition_job)
+
+        # Final output after filtering
+        if (len(tuition_job["suitable_tutors"]) > 0):
+            suitable_tutors = []
+            for tutor in tuition_job["suitable_tutors"]:
+                suitable_tutors.append(tutor["name"])
+            print(f"\n✅ This job is suitable for: {suitable_tutors}")
+        else:
+            print("\n😑 This job isn't suitable for anyone...")
+
     else:
         print("\n\n===============📨📨📨===============")
-        print(f"Not a tuition channel. It is {type(chat)} instead")
+        print(f"Not a tuition channel.")
         print(f"Type: {type(chat)}")
         if (type(chat) == types.Channel):
             print(f"It's from [{chat.title}]")

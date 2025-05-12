@@ -1,2 +1,3 @@
 googlemaps
 telethon
+python-dotenv
