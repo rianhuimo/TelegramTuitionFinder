@@ -188,3 +188,4 @@ cython_debug/
 /.venv
 /.venv/Lib
 *.session
+*.session
