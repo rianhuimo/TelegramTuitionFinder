@@ -1,9 +1,10 @@
 import re
 from classes.TuitionJob import TuitionJob
+from utils.details_extractor import create_tuition_job
 from utils.tuition_utils import match_tutors
 from telethon import TelegramClient, events, types
 
-tuition_finder_chat = "🏫 Rian's Tuition Assignments"
+tuition_finder_chat = r"https://t.me/+TrY9lhBoincxYTU1"
 
 # My own Telegram Client
 api_id = 20415981
@@ -23,29 +24,34 @@ async def my_event_handler(event):
 
     if (
         type(chat) == types.Channel and
-        re.findall(r"tutor|tuition",chat.title.lower())
+        re.findall(r"tutor|tuition",chat.title.lower()) and
+        not ("rian's tuition" in chat.title.lower())
         ):
         
         message = event.message.message
 
-        # (1)-A retrieve tuition job info
-        job = TuitionJob(message=message,channel_name=chat.title)
-
         print("\n\n===============🏫🗺️👩🏼‍🏫===============")
         print(f"Tuition channel message intercepted: [{chat.title}]")
-        print(f"Address: {job.address}")
 
-        # (2)-A match suitable tutors
-        match_tutors(job)
+        # (1)-1.0 retrieve tuition job info
+        # job = TuitionJob(message=message,channel_name=chat.title)
 
-        # (3)-A Output the final TuitionJob object to the bot!
-        if (len(job.suitable_tutors) > 0):
-            # for suitable_tutor in job.suitable_tutors:
-            #     print(f"\n✅ This job is suitable for: {suitable_tutor[0].telegram_handle}, with a fastest commute of {suitable_tutor[1]["text"]}")
+        # (1)-2.0
+        tuition_job = create_tuition_job(message=message,channel_name=chat.title)
 
-            await send_to_chat(job)
-        else:
-            print("\n😑 This job isn't suitable for anyone...")
+        # (2)-1.0 match suitable tutors
+        # match_tutors(job)
+
+        # (2)-2.0
+
+        # (3)-1.0 Output the final TuitionJob object to the bot!
+        # if (len(job.suitable_tutors) > 0):
+        #     # for suitable_tutor in job.suitable_tutors:
+        #     #     print(f"\n✅ This job is suitable for: {suitable_tutor[0].telegram_handle}, with a fastest commute of {suitable_tutor[1]["text"]}")
+
+        #     await send_to_chat(job)
+        # else:
+        #     print("\n😑 This job isn't suitable for anyone...")
 
         print("\n\n===============📚📚📚===============")
         print(f"Here's the full message:")
@@ -69,6 +75,7 @@ async def send_to_chat(job:TuitionJob):
         message += f"\n🗺️ Fastest commute: {suitable_tutor[1]["text"]}"
         message += f"\n📚 Subject matches: {suitable_tutor[2]}"
         message += f"\n🏫 Experience matches: {suitable_tutor[3]}"
+        message += f"\n🏫 Level matches: {suitable_tutor[4]}"
         message += "\n"
 
     message += f"\n\n📨 Full message 📨\n{job.message}"
@@ -90,13 +97,13 @@ async def begin(event):
     print(type(event_latch))
     
     print("🤖 Bot started. Saving event (hopefully)")
-    await event_latch.reply("🐙 TuitionFinder started! Detecting tuition jobs... 🔍")
+    await event.reply("🐙 TuitionFinder started! Detecting tuition jobs... 🔍")
 
 @bot.on(events.NewMessage(pattern='/test'))
 async def begin(event):
     # This should reference the original "/start" message
     global event_latch
-    await event_latch.reply("(This is a test) Replying to /start")
+    await event_latch.respond("(This is a test) Replying to /start")
 
 async def start_tuition_bot():
     await client.send_message(tuition_finder_chat,"/start")

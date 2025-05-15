@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import os
 import re
 from typing import List
@@ -7,7 +8,7 @@ import googlemaps
 from classes.TuitionJob import TuitionJob
 import classes.Tutor as Tutor
 
-MAXIMUM_COMMUTE_TIME = 45 # in minutes
+MAXIMUM_COMMUTE_TIME = 30 # in minutes
 
 load_dotenv()
 gmaps = googlemaps.Client(key=os.getenv("GOOGLE_MAPS_API_KEY"))
@@ -17,17 +18,22 @@ def get_directions(job_address:str, tutor_address:str) -> List[object]:
     now = datetime.now()
     try:
         directions_result = gmaps.directions(origin=tutor_address,
-                                        destination=job_address,
-                                        mode="transit",
-                                        departure_time=now,
-                                        transit_mode=["bus","rail"],
-                                        alternatives=True)
-        
-        # sort the possible routes in ascending order
-        sorted_routes = sorted(directions_result,key=lambda result:result["legs"][0]["duration"]["value"])
+                                    destination=job_address,
+                                    mode="transit",
+                                    departure_time=now,
+                                    transit_mode=["bus","rail"],
+                                    alternatives=True)
+        # print(json.dumps(directions_result,indent=2))
+        if (len(directions_result) > 0):
+            # sort the possible routes in ascending order
+            sorted_routes = sorted(directions_result,key=lambda result:result["legs"][0]["duration"]["value"])
+        else:
+            print("No directions were found for some reason.")
+            sorted_routes = []
         return sorted_routes
-    except:
-        print(f"⚠️⚠️ Error parsing address: {job_address}")
+        
+    except Exception as e:
+        print(f"⚠️⚠️ Error parsing address: {job_address}. Error: {e}")
    
 # Should be a bit more elegant.
 def match_tutors(job:TuitionJob) -> List:
@@ -80,9 +86,19 @@ def match_tutors(job:TuitionJob) -> List:
         except Exception as e:
             print(f"There was an error getting tutor experience: {e}")
 
-        if (commute_check and subject_check and experience_check):
+        # Filter for level
+        try:
+            level_filter = "|".join(tutor.level)
+            level_match = re.findall(level_filter,job.message,flags=re.IGNORECASE)
+            level_check = len(level_match) > 0
+            if (level_check): print(f"✅ Matched these levels for {tutor.name}: {level_match}")
+            else: print(f"⛔ No levels matched with tutor details: {level_filter}")
+        except Exception as e:
+            print(f"There was an error getting student level: {e}")
+
+        if (commute_check and subject_check and experience_check and level_check):
             # Tutor is suitable
-            suitable_tutors.append([tutor,fastest_commute_duration,subject_match,experience_match])
+            suitable_tutors.append([tutor,fastest_commute_duration,subject_match,experience_match,level_match])
 
     job.suitable_tutors = suitable_tutors
 

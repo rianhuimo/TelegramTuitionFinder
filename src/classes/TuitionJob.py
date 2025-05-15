@@ -1,18 +1,38 @@
 import re
-from typing import List
-from classes.TuitionChannel import TUITION_CHANNEL_LIST, TuitionChannel
+from .SuitableTutor import SuitableTutor
+from .TuitionChannel import TUITION_CHANNEL_LIST, TuitionChannel
 
 class TuitionJob():
 
-    # Idea: simply create the object and populate it's fields by extracting info from the message within this constructor
-    # IMPORTANT: some details will NOT be extracted as they can simply be directly matched against regex with the whole message.
+    # Basic constructor. Called by details_extractor.py
+    def __init__(
+            self, 
+            message:str, 
+            address:str, 
+            subjects:list[str], 
+            subject_levels:list[str], 
+            experience:int,
+            suitable_tutors:list[SuitableTutor],
+            tuition_channel:TuitionChannel):
+        
+        self.message = message # store original message
+        self.address = address
+        self.subjects = subjects
+        self.subject_levels = subject_levels
+        self.experience = experience
+
+        self.suitable_tutors = suitable_tutors
+        self.tuition_channel = tuition_channel
+
+
+    # TODO: delete this old one.
     def __init__(self, message:str, channel_name:str):
 
         # store original message
         self.message = message
         
         # placeholders
-        self.suitable_tutors:List = []
+        self.suitable_tutors:list = []
 
         # get the correct tuition channel to be filtering against
         self.tuition_channel:TuitionChannel = None
@@ -36,6 +56,5 @@ class TuitionJob():
             print(f"No match for any tuition channel: {channel_name}")
 
 if (__name__ == "__main__"):
-    test = TuitionJob("test msg1","non-existent channel")
-    test = TuitionJob("test msg2","Tuition Assignments Singapore - SG Tuition Jobs / SG Tuition Assignments")
+    pass
         

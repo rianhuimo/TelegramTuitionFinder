@@ -1,0 +1,6 @@
+import re
+
+regex = r" sec | secondary "
+
+print(re.findall(regex,"looking for sec 3 teacher",flags=re.IGNORECASE))
+print(re.findall(regex,"looking for secondary 3 teacher",flags=re.IGNORECASE))
