@@ -1,10 +1,37 @@
 
 # Establishing the hierarchy for tutor experience
-TUTOR_EXPERIENCE_HIERARCHY = {
-    "Student/Part-time":1,
-    "Graduate/Full-time":2,
-    "Ex/Current MOE":3
-} 
+STUDENT_OR_PART_TIME=1
+GRADUATE_OR_FULL_TIME=2
+EX_CURRENT_MOE=3
+
+# Subjects constants - can be associated with a regex pattern perhaps?
+ENGLISH="english"
+CHINESE="chinese"
+MATH="math"
+SCIENCE="science"
+PHYSICS="physics"
+CHEMISTRY="chemistry"
+BIOLOGY="biology"
+COMPUTING="computing"
+LITERATURE="literature"
+GENERAL_PAPER="general paper"
+
+# Subject levels
+PRIMARY_LEVEL = r" pri | primary | p[1-6] "
+SECONDARY_LEVEL = r" sec | secondary "
+POLYTECHNIC_LEVEL = r" poly | polytechnic "
+JUNIOR_COLLEGE_LEVEL = r" jc | junior college | jc[1-2]"
+
+# Address for online tuition
+ONLINE_TUITION = "online"
+
+# Gender constants
+MALE='male'
+FEMALE='female'
+
+# Commuting constants for Google Directions API parameters TODO: modify get_directions() method
+PUBLIC_TRANSPORT="transit" # mode=Tutor.PUBLIC_TRANSPORT,transit_mode=["bus","rail"]
+DRIVING="driving" # mode=Tutor.DRIVING
 
 class Tutor():
     def __init__(
@@ -23,57 +50,32 @@ class Tutor():
         self.subjects = subjects
         self.subject_levels = subject_levels
         self.experience = experience
-        self.address = address
+        self.address = address # None if tutor is online
         self.gender = gender
         self.commute_method = commute_method
-        self.max_commute_time = max_commute_time
+        self.max_commute_time = max_commute_time # None if tutor is online
 
 # Instantianting my predefined tutor filters
 RIAN = Tutor(
         name="Rian 🪴",
         telegram_handle="@rianhuii",
-        subjects=[
-            "math",
-            "science",
-            "physics",
-            "chemistry",
-            "computing"
-        ],
-        experience=[
-            "student",
-            "part",
-            "full",
-            "private",
-        ],
-        subject_levels=[
-            r" sec | secondary ",
-            r" poly | polytechnic ",
-        ],
+        subjects=[MATH,SCIENCE,PHYSICS,CHEMISTRY,COMPUTING],
+        experience=2,
+        subject_levels=[SECONDARY_LEVEL,POLYTECHNIC_LEVEL],
         address="40B Margaret Drive",
-        gender="male",
-        commute_method=["bus","rail"],
+        gender=MALE,
+        commute_method=PUBLIC_TRANSPORT,
         max_commute_time=30,
     )
 MUM = Tutor(
     name="Mum 🌸",
     telegram_handle="@Nekotokuma",
-    subjects=[
-        "english",
-        "science",
-    ],
-    experience=[
-        "full",
-        "moe",
-        "private",
-        "above",
-    ],
-    subject_levels=[
-            r" sec | secondary ",
-            r" pri | primary | p[1-6] ",
-    ],
+    subjects=[ENGLISH,SCIENCE],
+    experience=3,
+    subject_levels=[PRIMARY_LEVEL,SECONDARY_LEVEL],
     address="40B Margaret Drive",
-    gender="female",
-    commute_method=["bus","rail"],
+    gender=FEMALE,
+    commute_method=PUBLIC_TRANSPORT,
     max_commute_time=30,
 )
 
@@ -84,25 +86,23 @@ TUTOR_LIST:list[Tutor] = [
     Tutor(
         name="Rachel",
         telegram_handle="@rachellor",
-        subjects=[
-            "math",
-            "english",
-            "literature",
-            "chemistry",
-            "general paper"
-        ],
-        experience=[
-            "full",
-            "private",
-            "above",
-        ],
-        subject_levels=[
-                r" sec | secondary ",
-                r" poly | polytechnic ",
-        ],
+        subjects=[MATH,ENGLISH,LITERATURE,CHEMISTRY,GENERAL_PAPER],
+        experience=2,
+        subject_levels=[SECONDARY_LEVEL,POLYTECHNIC_LEVEL],
         address="Sembawang MRT",
-        gender="female",
-        commute_method=["bus","rail"],
+        gender=FEMALE,
+        commute_method=PUBLIC_TRANSPORT,
+        max_commute_time=30,
+    ),
+    Tutor(
+        name="Delia",
+        telegram_handle="@ddxliaa",
+        subjects=[MATH],
+        experience=2,
+        subject_levels=[JUNIOR_COLLEGE_LEVEL],
+        address=ONLINE_TUITION,
+        gender=FEMALE,
+        commute_method=None,
         max_commute_time=30,
     )
 ]

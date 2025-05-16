@@ -11,7 +11,8 @@ class TuitionJob():
             address:str, 
             subjects:list[str], 
             subject_levels:list[str], 
-            experience:int,
+            experience:list[int], # most jobs have multiple tutor experience levels for price ranges
+            gender_preference:str, # can be None if there is no preference found
             suitable_tutors:list[SuitableTutor],
             tuition_channel:TuitionChannel):
         
@@ -20,6 +21,7 @@ class TuitionJob():
         self.subjects = subjects
         self.subject_levels = subject_levels
         self.experience = experience
+        self.gender_preference = gender_preference
 
         self.suitable_tutors = suitable_tutors
         self.tuition_channel = tuition_channel
