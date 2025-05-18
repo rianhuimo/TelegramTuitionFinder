@@ -11,13 +11,13 @@ class TuitionChannel():
             subject_levels_regex:str,
             experience_regex:str,
             gender_preference_regex:str):
-        self.channel_name = channel_name
-        self.channel_link = channel_link
-        self.address_regex = address_regex
-        self.subjects_regex = subjects_regex
-        self.subject_levels_regex = subject_levels_regex
-        self.experience_regex = experience_regex
-        self.gender_preference_regex = gender_preference_regex # If no preference, regex will return []
+        self.channel_name:str = channel_name
+        self.channel_link:str = channel_link
+        self.address_regex:str = address_regex
+        self.subjects_regex:str = subjects_regex
+        self.subject_levels_regex:str = subject_levels_regex
+        self.experience_regex:str = experience_regex
+        self.gender_preference_regex:str = gender_preference_regex # If no preference, regex will return []
 
 TUITION_CHANNEL_LIST = [
     TuitionChannel(
@@ -26,8 +26,8 @@ TUITION_CHANNEL_LIST = [
         address_regex=r"Address: (.*)",
         subjects_regex=r"Subject: (.*)",
         subject_levels_regex=r"Subject: (.*)",
-        experience_regex=r"\((.*) Tutor\)",
-        gender_preference_regex=r"\((.*) Tutor\)"
+        experience_regex=r"Code ID: .*\n([\s\S]*)\nSubject:",
+        gender_preference_regex=r"Code ID: .*\n([\s\S]*)\nSubject:"
     ),
     TuitionChannel(
         channel_name="Tuition Assignments Jobs Singapore🇸🇬",
@@ -35,7 +35,7 @@ TUITION_CHANNEL_LIST = [
         address_regex=r"Location/Area: (.*)",
         subjects_regex=r"Level and Subject\(s\): (.*)",
         subject_levels_regex=r"Level and Subject\(s\): (.*)",
-        experience_regex=r"Hourly Rate: (.*)|Parent prefers to engage a (.*)",
+        experience_regex=r"Hourly Rate: (.*)|Parent prefers to engage a (.*)|Looking for (.*)",
         gender_preference_regex=r"Remarks: Tutors who include their relevant teaching experience in details have higher success rate of being engaged by the parent\.\n\n"
     ),
     TuitionChannel(
@@ -68,7 +68,7 @@ TUITION_CHANNEL_LIST = [
     TuitionChannel(
         channel_name="Tuition Jobs (LearnTogether.SG)",
         channel_link="https://t.me/MinistryofTuitionSG",
-        address_regex=r"Location: (.*)",
+        address_regex=r"Location: (.*) \(",
         subjects_regex=r"Subject: (.*)",
         subject_levels_regex=r"Subject: (.*)",
         experience_regex=r"Fees: (.*)|Remarks: (.*)",

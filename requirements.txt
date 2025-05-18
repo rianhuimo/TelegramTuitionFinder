@@ -2,3 +2,4 @@ googlemaps
 telethon
 python-dotenv
 ollama
+pysondb
