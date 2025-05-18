@@ -2,4 +2,4 @@ googlemaps
 telethon
 python-dotenv
 ollama
-pysondb
+pysondb==1.6.6

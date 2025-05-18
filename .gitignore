@@ -189,3 +189,4 @@ cython_debug/
 /.venv/Lib
 *.session
 *.session
+tutors.json

@@ -2,13 +2,32 @@ from classes.tuition_job import TuitionJob
 import classes.tutor as Tutor
 from classes.suitable_tutor import SuitableTutor
 from utils.directions_api import get_directions
+from pysondb import db
 
 def find_suitable_tutors(job:TuitionJob) -> list[SuitableTutor]:
 
     # Strategy: If the tutor passes all the checks, it will get to the end of the for loop where it will be added to the list
     suitable_tutors:list[SuitableTutor] = []
 
-    for tutor in Tutor.TUTOR_LIST:
+    # retrieve all tutors from database
+    database = db.getDb("tutors.json")
+    all_data = database.getAll()
+    tutor_list:list[Tutor.Tutor] = []
+    for tutor in all_data:
+        tutor_list.append(Tutor.Tutor(
+            name=tutor["name"],
+            telegram_handle=tutor["telegram_handle"],
+            subjects=set(tutor["subjects"]),
+            subject_levels=set(tutor["subject_levels"]),
+            experience=set(tutor["experience"]),
+            address=tutor["address"],
+            gender=set(tutor["gender"]),
+            commute_method=tutor["commute_method"],
+            max_commute_time=tutor["max_commute_time"],
+        ))
+        
+    for tutor in tutor_list:
+    # for tutor in Tutor.TUTOR_LIST:
         print(f"\nEvaluating job for {tutor.telegram_handle}:")
         # Calculate commute
         if job.address == Tutor.ONLINE_TUITION: # If the job is online, return an appropriate fastest_commute value of 0 mins

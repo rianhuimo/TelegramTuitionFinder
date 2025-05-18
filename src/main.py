@@ -6,6 +6,8 @@ from utils.details_extractor import create_tuition_job
 from telethon import Button, TelegramClient, events, types, tl
 from dotenv import load_dotenv
 
+from bot import interactions, crud
+
 load_dotenv()
 tuition_finder_chat = os.getenv('TUITION_FINDER_CHAT')
 
@@ -16,8 +18,7 @@ client = TelegramClient('rian', api_id, api_hash).start()
 
 # @TuitionFinderBot
 bot_token = os.getenv('BOT_TOKEN')
-bot = TelegramClient('TuitionFinderBot', api_id, api_hash).start(bot_token=bot_token)
-event_latch = None
+tuition_finder_bot = TelegramClient('TuitionFinderBot', api_id, api_hash).start(bot_token=bot_token)
 
 @client.on(events.NewMessage)
 async def my_event_handler(event):
@@ -76,74 +77,45 @@ async def broadcast_to_tutors(job:TuitionJob):
         # Send message to tutor
         try:
             # ‼️ Important! Make sure that the tutor has initiated a chat before the bot is able to send them a private message
-            await bot.send_message(suitable_tutor.telegram_handle,message=message)
+            await tuition_finder_bot.send_message(suitable_tutor.telegram_handle,message=message)
         except Exception as e:
             print(f"⛔ Error occured when trying to forward job to {suitable_tutor.telegram_handle}: {e}")
 
-# Entry command to CRUD operations via button navigation
-@bot.on(events.callbackquery.CallbackQuery(data="start"))
-async def start(event:events.newmessage.NewMessage.Event):
-    message:tl.patched.Message = event.message
-    chat = await event.get_chat()
-    if type(chat) == types.User:
-        user:types.User = chat
-        telegram_handle = f"@{user.username}"
-        try:
-            # user.username is equivalent to Tutor.telegram_handle
-            await message.respond(f"🔍 Searching for your tutor details (@{telegram_handle})...")
-            # I can use this instead of the shorthand function "event.respond()" as it no longer gives me parameter hints. Use this as a baseline
-            await bot.send_message(
-                entity=chat,
-                message="this message should contain your tutor details (if any)",
-                buttons=[
-                    Button.inline(text="Edit my details",data=f"edit/{telegram_handle}"),
-                ])
-        except Exception as e:
-            print(f"⛔ Error occured while sending messages: {e}. Error on line {e.__traceback__.tb_lineno}")
-    raise events.StopPropagation
+# ===== Commands =====
 
-# Edit tutor details. I'm providing a regex pattern in this context.
-@bot.on(events.callbackquery.CallbackQuery(data=re.compile(r"edit/")))
-async def edit(event:events.newmessage.NewMessage.Event):
-    chat = await event.get_chat()
-    if type(chat) == types.User:
-        user:types.User = chat
-        telegram_handle = f"@{user.username}"
-        event.respond("Edit request received.")
+# Entry command to CRUD operations via button navigation
+@tuition_finder_bot.on(events.newmessage.NewMessage(pattern="/start",incoming=True))
+async def start(event:events.newmessage.NewMessage.Event):
+    await interactions.start(event=event,tuition_finder_bot=tuition_finder_bot)
+
+# Secret function to seed data into database...woahhhh
+@tuition_finder_bot.on(events.newmessage.NewMessage(pattern="/seed",incoming=True))
+async def start(event:events.newmessage.NewMessage.Event):
+    await crud.seed_data(event=event,tuition_finder_bot=tuition_finder_bot)
 
 # The default response for any unrecognized message received from the bot
 # Introduces itself and provides the possible ways to interact with it
 # I think this has to be the LAST function I put in this script
-@bot.on(events.NewMessage)
-async def default(event):
-    # print(event.message.stringify())
-    print("📬 Received a message")
-    chat = await event.get_chat()
-    try:
-        if type(chat) == types.User:
-                # I can use this instead of the shorthand function "event.respond()" as it no longer gives me parameter hints. Use this as a baseline
-                await bot.send_message(
-                    entity=chat,
-                    message="🐙 Hello! I'm TuitionFinder. 🤖" + 
-                    "\n🏫 I scour all Singapore Telegram Tuition Channels to help tutors connect with the right students. 🧑🏼‍🎓" +
-                    "\n\nInteract with me by texting /start",
-                    buttons=[
-                        Button.url(text="Link to cool music", url="https://open.spotify.com/album/0ErRTuEFNp7E7Yp8iWLSkw?flow_ctx=01b42b72-3a04-4a21-8985-9664f2d2a259%253A17"),
-                    ])
-        else:
-            await event.respond(
-                message="🐙 Hello! I'm TuitionFinder. 🤖" + 
-                    "\n🏫 I scour all Singapore Telegram Tuition Channels to help tutors connect with the right students. 🧑🏼‍🎓" +
-                    "\n\n Interact with me through a direct message!",
-                buttons=[
-                    Button.url(text="📨 Message Bot", url="https://t.me/TuitionFinderBot"),
-                ])
-    except Exception as e:
-        print(f"⛔ Error occured while sending messages: {e}. Error on line {e.__traceback__.tb_lineno}")
+@tuition_finder_bot.on(events.NewMessage(incoming=True))
+async def default(event:events.newmessage.NewMessage.Event):
+    await interactions.default_message(event=event,tuition_finder_bot=tuition_finder_bot)
+
+# ===== Callback Queries =====
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="read"))
+async def read(event:events.newmessage.NewMessage.Event):
+    await interactions.read(event=event,tuition_finder_bot=tuition_finder_bot)
+
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="update"))
+async def update(event:events.newmessage.NewMessage.Event):
+    await interactions.update(event=event,tuition_finder_bot=tuition_finder_bot)
+
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="delete"))
+async def delete(event):
+    await interactions.delete(event=event,tuition_finder_bot=tuition_finder_bot)
 
 async def main():
     await client.run_until_disconnected()
-    await bot.run_until_disconnected()
+    await tuition_finder_bot.run_until_disconnected()
 
 with client:
     client.loop.run_until_complete(main())
