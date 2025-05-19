@@ -19,6 +19,7 @@ client = TelegramClient('rian', api_id, api_hash).start()
 # @TuitionFinderBot
 bot_token = os.getenv('BOT_TOKEN')
 tuition_finder_bot = TelegramClient('TuitionFinderBot', api_id, api_hash).start(bot_token=bot_token)
+tuition_finder_bot.parse_mode = "markdown"
 
 @client.on(events.NewMessage)
 async def my_event_handler(event):
@@ -105,13 +106,34 @@ async def default(event:events.newmessage.NewMessage.Event):
 async def read(event:events.newmessage.NewMessage.Event):
     await interactions.read(event=event,tuition_finder_bot=tuition_finder_bot)
 
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(pattern="create"))
+async def read(event:events.newmessage.NewMessage.Event):
+    await interactions.create_profile(event=event,tuition_finder_bot=tuition_finder_bot)
+
 @tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="update"))
 async def update(event:events.newmessage.NewMessage.Event):
     await interactions.update(event=event,tuition_finder_bot=tuition_finder_bot)
 
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(pattern="submit_profile"))
+async def read(event:events.newmessage.NewMessage.Event):
+    await interactions.submit_profile(event=event,tuition_finder_bot=tuition_finder_bot)
+
 @tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="delete"))
 async def delete(event):
     await interactions.delete(event=event,tuition_finder_bot=tuition_finder_bot)
+
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="confirm_delete"))
+async def confirm_delete(event):
+    await interactions.confirm_delete(event=event,tuition_finder_bot=tuition_finder_bot)
+
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="cancel"))
+async def cancel(event):
+    await interactions.cancel(event=event,tuition_finder_bot=tuition_finder_bot)
+
+@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="home"))
+async def home(event):
+    await event.answer("🏠 Going home")
+    await interactions.start(event=event,tuition_finder_bot=tuition_finder_bot)
 
 async def main():
     await client.run_until_disconnected()
