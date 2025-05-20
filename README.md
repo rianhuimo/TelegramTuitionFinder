@@ -58,7 +58,7 @@ I was rather annoyed at the act of scrolling through hundreds of tuition job app
 
 ## Calling all Singapore-based private tutors!
 
-> I'd love to see if this bot could assist you in finding students! You could give this a try @TuitionFinderBot, and let me know at rianhuimo@gmail.com about your experience with it!
+> I'd love to see if this bot could assist you in finding students! You could give this a try [@TuitionFinderBot](https://t.me/TuitionFinderBot), and let me know at rianhuimo@gmail.com about your experience with it!
 > ~ Rian 🪴
 
 
