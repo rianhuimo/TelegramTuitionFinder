@@ -1,0 +1,41 @@
+classDiagram
+  class src {
+  }
+  class bot {
+  }
+  class crud {
+  }
+  class interactions {
+  }
+  class classes {
+  }
+  class constant {
+  }
+  class suitable_tutor {
+  }
+  class tuition_channel {
+  }
+  class tuition_job {
+  }
+  class tutor {
+  }
+  class main {
+  }
+  class utils {
+  }
+  class details_extractor {
+  }
+  class directions_api {
+  }
+  class tutor_filter {
+  }
+  suitable_tutor --> tutor
+  tuition_job --> suitable_tutor
+  tuition_job --> tuition_channel
+  tutor --> constant
+  main --> bot
+  main --> crud
+  main --> interactions
+  main --> tuition_job
+  main --> details_extractor
+  main --> tutor_filter

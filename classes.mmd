@@ -1,0 +1,44 @@
+classDiagram
+  class Constant {
+    name : str
+    regex_pattern : str
+  }
+  class SuitableTutor {
+    experience_match : set[str]
+    fastest_commute : dict
+    subject_levels_match : set[str]
+    subjects_match : set[str]
+  }
+  class TuitionChannel {
+    address_regex : str
+    channel_link : str
+    channel_name : str
+    experience_regex : str
+    gender_preference_regex : str
+    subject_levels_regex : str
+    subjects_regex : str
+  }
+  class TuitionJob {
+    address : str
+    experience : set[str]
+    gender_preference : set[str]
+    message : str
+    subject_levels : set[str]
+    subjects : set[str]
+    suitable_tutors : list[SuitableTutor]
+    tuition_channel
+    to_string()
+  }
+  class Tutor {
+    address : str
+    commute_method : str
+    experience : set[str]
+    gender : set[str]
+    max_commute_time : int
+    name : str
+    subject_levels : set[str]
+    subjects : set[str]
+    telegram_handle : str
+  }
+  SuitableTutor --|> Tutor
+  TuitionChannel --o TuitionJob : tuition_channel

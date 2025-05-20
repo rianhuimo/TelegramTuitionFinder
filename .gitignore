@@ -190,3 +190,8 @@ cython_debug/
 *.session
 *.session
 tutors.json
+sessions.json
+rian.session-journal
+TuitionFinderBot.session-journal
+sessions.json
+/src/test

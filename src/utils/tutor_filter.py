@@ -30,12 +30,12 @@ def find_suitable_tutors(job:TuitionJob) -> list[SuitableTutor]:
     # for tutor in Tutor.TUTOR_LIST:
         print(f"\nEvaluating job for {tutor.telegram_handle}:")
         # Calculate commute
-        if job.address == Tutor.ONLINE_TUITION: # If the job is online, return an appropriate fastest_commute value of 0 mins
+        if job.address == Tutor.ONLINE_TUITION.regex_pattern: # If the job is online, return an appropriate fastest_commute value of 0 mins 
             fastest_commute = { "text": "0 mins", "value": 0 }
             print(f"✅ Job is online")
         elif job.address is None: continue # This usually occurs for compilation-style tuition job messages. For the purpose of this program, I will not be broadcasting them.
         else    : # if the job has a physical address
-            if tutor.address == Tutor.ONLINE_TUITION: 
+            if tutor.address == Tutor.ONLINE_TUITION.regex_pattern: 
                 print(f"❌ Tutor is online only, but job has physical address")
                 continue # if the tutor is online only, skip this tutor entirely as it is incompatible.
 
@@ -45,15 +45,15 @@ def find_suitable_tutors(job:TuitionJob) -> list[SuitableTutor]:
                 commute_method=tutor.commute_method)[0]["legs"][0]["duration"]
             
             if fastest_commute['value'] > tutor.max_commute_time*60: 
-                print(f"❌ Fastest commute from {tutor.telegram_handle}'s house: {fastest_commute['text']}. Exceeds tutor's max commute of {tutor.max_commute_time} mins")
+                print(f"❌ Fastest commute from {tutor.telegram_handle}'s house: {fastest_commute['text']}. Exceeds tutor's max commute of {tutor.max_commute_time} mins via {tutor.commute_method}.")
                 # If commute time exceeds tutor's maximum, skip it. Max commute time is given in minutes
                 continue
-            print(f"✅ Fastest commute from {tutor.telegram_handle}'s house: {fastest_commute['text']}. Within tutor's max commute of {tutor.max_commute_time} mins")
+            print(f"✅ Fastest commute from {tutor.telegram_handle}'s house: {fastest_commute['text']}. Within tutor's max commute of {tutor.max_commute_time} mins via {tutor.commute_method}.")
         # Commute check passed
 
         # Match subjects - subset
-        subject_match:bool = job.subjects.issubset(tutor.subjects)
-        if subject_match:
+        subject_match:set = job.subjects.intersection(tutor.subjects)
+        if len(subject_match) > 0:
             print(f"✅ Subjects matched with tutor: {job.subjects}. Tutor's teachable subjects: {tutor.subjects}")
         else:
             print(f"❌ No match for subjects: {job.subjects}. Tutor's teachable subjects: {tutor.subjects}")

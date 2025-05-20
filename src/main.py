@@ -1,6 +1,7 @@
 import os
 import re
 from classes.tuition_job import TuitionJob
+from classes.tuition_channel import TUITION_CHANNEL_LIST
 from utils.tutor_filter import find_suitable_tutors
 from utils.details_extractor import create_tuition_job
 from telethon import Button, TelegramClient, events, types, tl
@@ -9,7 +10,6 @@ from dotenv import load_dotenv
 from bot import interactions, crud
 
 load_dotenv()
-tuition_finder_chat = os.getenv('TUITION_FINDER_CHAT')
 
 # My own Telegram Client
 api_id = os.getenv('TELEGRAM_API_ID')
@@ -21,21 +21,26 @@ bot_token = os.getenv('BOT_TOKEN')
 tuition_finder_bot = TelegramClient('TuitionFinderBot', api_id, api_hash).start(bot_token=bot_token)
 tuition_finder_bot.parse_mode = "markdown"
 
+tuition_channels = [channel.channel_name for channel in TUITION_CHANNEL_LIST]
+print("===== 🤖 TuitionFinder Started =====")
+for name in tuition_channels:
+    print(name)
+print("===== 📢 Tuition Channels Registered =====")
+
 @client.on(events.NewMessage)
 async def my_event_handler(event):
     # print(event.message.stringify())
     # getting info about the channel for dev purpose
     chat = await event.get_chat()
 
-    if (
-        type(chat) == types.Channel and
-        re.findall(r"tutor|tuition",chat.title.lower()) and
-        not ("rian's tuition" in chat.title.lower())
-        ):
+    # Only process messages from tuition channels
+    if (type(chat) == types.Channel and (chat.title in tuition_channels)):
+        # re.findall(r"tutor|tuition",chat.title.lower()) and
+        # not ("rian's tuition" in chat.title.lower())
         
         message = event.message.message
 
-        print("\n\n===============🏫🗺️👩🏼‍🏫===============")
+        print("\n===============🏫🗺️👩🏼‍🏫===============")
         print(f"Tuition channel message intercepted: [{chat.title}]")
 
         # (1)-2.0
@@ -51,13 +56,12 @@ async def my_event_handler(event):
         else:
             print("\n😑 This job isn't suitable for anyone...")
 
-        print("\n\n===============📚📚📚===============")
+        print("\n===============📚📚📚===============")
         print(f"Here's the full message:")
         print(event.message.message)
 
     else:
-        print("\n===============📪📪📪===============")
-        print(f"Not a tuition channel.")
+        print(f"📪 Not a tuition channel. Chat title: {chat.title}")
 
 async def broadcast_to_tutors(job:TuitionJob):
     print(f"📣 Broadcasting job to suitable tutors: {[tutor.telegram_handle for tutor in job.suitable_tutors]}")
@@ -67,7 +71,7 @@ async def broadcast_to_tutors(job:TuitionJob):
         # Craft the message
         message = ""
         message += f"\n✅ This job is suitable for: {suitable_tutor.telegram_handle}"
-        message += f"\n🗺️ Fastest commute: {suitable_tutor.fastest_commute}"
+        message += f"\n🗺️ Fastest commute: {suitable_tutor.fastest_commute["text"]} via {suitable_tutor.commute_method}"
         message += f"\n📚 Subject matches: {suitable_tutor.subjects_match}"
         message += f"\n🏫 Subject level matches: {suitable_tutor.subject_levels_match}"
         message += f"\n💼 Experience matches: {suitable_tutor.experience_match}"
@@ -109,10 +113,6 @@ async def read(event:events.newmessage.NewMessage.Event):
 @tuition_finder_bot.on(events.callbackquery.CallbackQuery(pattern="create"))
 async def read(event:events.newmessage.NewMessage.Event):
     await interactions.create_profile(event=event,tuition_finder_bot=tuition_finder_bot)
-
-@tuition_finder_bot.on(events.callbackquery.CallbackQuery(data="update"))
-async def update(event:events.newmessage.NewMessage.Event):
-    await interactions.update(event=event,tuition_finder_bot=tuition_finder_bot)
 
 @tuition_finder_bot.on(events.callbackquery.CallbackQuery(pattern="submit_profile"))
 async def read(event:events.newmessage.NewMessage.Event):

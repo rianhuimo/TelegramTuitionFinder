@@ -22,14 +22,13 @@ def get_directions(
     job_address = job_address.lower().replace("near","")
 
     try:
-        if commute_method == Tutor.PUBLIC_TRANSPORT:
+        if Tutor.DRIVING.regex_pattern in commute_method: # TODO: verify 
             directions_result = gmaps.directions(origin=f"Singapore {tutor_address}",
                                         destination=f"Singapore {job_address}",
-                                        mode="transit",
+                                        mode="driving",
                                         departure_time=now,
-                                        transit_mode=["bus","rail"],
                                         alternatives=True)
-        else: # driving is the only alternative to public transport in this logic. Unless you take a bicycle or walk. For now I'm just accommodating for these two transport modes.
+        else: # if no driving, default to public transport
             directions_result = gmaps.directions(origin=f"Singapore {tutor_address}",
                                         destination=f"Singapore {job_address}",
                                         mode="transit",
@@ -50,4 +49,4 @@ def get_directions(
 
 
 if (__name__ == "__main__"):
-    print("|".join(Tutor.TUTOR_LIST[0].subjects))
+    pass
